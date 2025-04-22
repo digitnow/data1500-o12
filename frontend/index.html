@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        canvas {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Twitter Statistikk</h1>
+    
+    <div class="chart-container">
+        <h2>Aktivitet over tid</h2>
+        <canvas id="activityChart"></canvas>
+    </div>
+    
+    <div class="chart-container">
+        <h2>Mest populære brukere</h2>
+        <canvas id="popularityChart"></canvas>
+    </div>
+
+    <script>
+        fetch('/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                // Aktivitet over tid
+                new Chart(
+                    document.getElementById('activityChart'),
+                    {
+                        type: 'line',
+                        data: {
+                            labels: data.activity.dates,
+                            datasets: [{
+                                label: 'Tweets per dag',
+                                data: data.activity.counts,
+                                borderColor: 'rgb(29, 161, 242)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false,
+                                }
+                            }
+                        }
+                    }
+                );
+
+                // Mest populære brukere
+                new Chart(
+                    document.getElementById('popularityChart'),
+                    {
+                        type: 'bar',
+                        data: {
+                            labels: data.popularity.usernames,
+                            datasets: [{
+                                label: 'Totalt antall likes',
+                                data: data.popularity.likes,
+                                backgroundColor: [
+                                    'rgba(29, 161, 242, 0.7)',
+                                    'rgba(20, 143, 220, 0.7)',
+                                    'rgba(16, 124, 191, 0.7)',
+                                    'rgba(13, 105, 161, 0.7)',
+                                    'rgba(10, 86, 132, 0.7)'
+                                ],
+                                borderColor: [
+                                    'rgb(29, 161, 242)',
+                                    'rgb(20, 143, 220)',
+                                    'rgb(16, 124, 191)',
+                                    'rgb(13, 105, 161)',
+                                    'rgb(10, 86, 132)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    }
+                );
+            });
+    </script>
+</body>
+</html>
